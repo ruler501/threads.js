@@ -53,7 +53,7 @@ function detectTsNode() {
     eval("require").resolve("ts-node")
     tsNodeAvailable = true
   } catch (error) {
-    if (instanceOfNodeError(error, TypeError) && error.code === "MODULE_NOT_FOUND") {
+    if (error instanceof Error && instanceOfNodeError(error, TypeError) && error.code === "MODULE_NOT_FOUND") {
       tsNodeAvailable = false
     } else {
       // Re-throw
