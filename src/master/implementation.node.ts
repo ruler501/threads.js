@@ -11,6 +11,7 @@ import {
   ThreadsWorkerOptions,
   WorkerImplementation
 } from "../types/master"
+import { TSError } from 'ts-node';
 
 interface WorkerGlobalScope {
   addEventListener(eventName: string, listener: (event: Event) => void): void
@@ -20,6 +21,18 @@ interface WorkerGlobalScope {
 
 declare const __non_webpack_require__: typeof require
 declare const self: WorkerGlobalScope
+
+/**
+ * A typeguarded version of `instanceof Error` for NodeJS.
+ * @author Joseph JDBar Barron
+ * @link https://dev.to/jdbar
+ */
+export function instanceOfNodeError<T extends new (...args: any) => Error>(
+    value: Error,
+    errorType: T
+): value is InstanceType<T> & NodeJS.ErrnoException {
+    return value instanceof errorType;
+}
 
 type WorkerEventName = "error" | "message"
 
@@ -40,7 +53,7 @@ function detectTsNode() {
     eval("require").resolve("ts-node")
     tsNodeAvailable = true
   } catch (error) {
-    if (error && error.code === "MODULE_NOT_FOUND") {
+    if (error instanceof Error && instanceOfNodeError(error, TypeError) && error.code === "MODULE_NOT_FOUND") {
       tsNodeAvailable = false
     } else {
       // Re-throw

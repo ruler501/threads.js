@@ -126,7 +126,9 @@ export class ObservablePromise<T> extends Observable<T> implements Promise<T> {
         try {
           resolve(onFulfilled(value))
         } catch (error) {
-          rejectionCallback(error)
+          if (error instanceof Error) {
+            rejectionCallback(error)
+          }
         }
       }
       if (!this.initHasRun) {

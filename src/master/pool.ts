@@ -181,12 +181,14 @@ class WorkerPool<ThreadType extends Thread> implements Pool<ThreadType> {
       })
     } catch (error) {
       this.debug(`Task #${task.id} failed`)
-      this.eventSubject.next({
-        type: PoolEventType.taskFailed,
-        taskID: task.id,
-        error,
-        workerID
-      })
+      if (error instanceof Error) {
+        this.eventSubject.next({
+          type: PoolEventType.taskFailed,
+          taskID: task.id,
+          error,
+          workerID
+        });
+      }
     }
   }
 
